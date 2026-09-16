@@ -1,0 +1,67 @@
+{
+  "kind": "collectionType",
+  "collectionName": "cars",
+  "info": {
+    "singularName": "car",
+    "pluralName": "cars",
+    "displayName": "Car"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "make": {
+      "type": "string"
+    },
+    "model": {
+      "type": "string"
+    },
+    "year": {
+      "type": "integer"
+    },
+    "price": {
+      "type": "integer"
+    },
+    "mileage": {
+      "type": "integer"
+    },
+    "description": {
+      "type": "text"
+    },
+    "image": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "color": {
+      "type": "string"
+    },
+    "engine_volume": {
+      "type": "decimal"
+    },
+    "engine_power": {
+      "type": "integer"
+    },
+    "drivetrain": {
+      "type": "string"
+    },
+    "transmission": {
+      "type": "string"
+    },
+    "condition": {
+      "type": "string"
+    },
+    "body_type": {
+      "type": "string"
+    },
+    "country": {
+      "type": "string"
+    }
+  }
+}
