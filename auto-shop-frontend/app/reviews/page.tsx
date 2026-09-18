@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 async function getReviews() {
-  const res = await fetch('http://localhost:1337/api/reviews?populate=*', { cache: 'no-store' });
+  const res = await fetch('https://auto-project-production-ecda.up.railway.app/api/reviews?populate=*', { cache: 'no-store' });
   if (!res.ok) return { data: [] };
   return res.json();
 }
@@ -88,7 +88,7 @@ export default async function ReviewsPage() {
             {reviews.map((review: any) => {
               const { id, text, photo } = review;
               let photoUrl = '';
-              if (photo && photo.url) photoUrl = `http://localhost:1337${photo.url}`;
+              if (photo && photo.url) photoUrl = `https://auto-project-production-ecda.up.railway.app${photo.url}`;
 
               return (
                 <div key={id} className="bg-black/70 backdrop-blur-sm border border-[#c9a227]/40 rounded-lg overflow-hidden hover:border-[#c9a227] hover:shadow-[0_0_40px_rgba(201,162,39,0.4)] transition">

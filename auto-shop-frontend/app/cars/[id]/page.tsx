@@ -3,7 +3,7 @@ import Gallery from './Gallery';
 import CallbackForm from '../../CallbackForm';
 
 async function getCar(id: string) {
-  const res = await fetch(`http://localhost:1337/api/cars/${id}?populate=*`, { cache: 'no-store' });
+  const res = await fetch(`https://auto-project-production-ecda.up.railway.app/api/cars/${id}?populate=*`, { cache: 'no-store' });
   if (!res.ok) throw new Error('Машина не найдена');
   const data = await res.json();
   return data.data;
@@ -32,7 +32,7 @@ export default async function CarPage({ params }: { params: Promise<{ id: string
   if (image && Array.isArray(image)) rawImages = image;
   else if (image && image.url) rawImages = [image];
 
-  const images = rawImages.map((img: any) => `http://localhost:1337${img.url}`);
+  const images = rawImages.map((img: any) => `https://auto-project-production-ecda.up.railway.app${img.url}`);
 
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-white" style={{ fontFamily: 'var(--font-oswald)' }}>

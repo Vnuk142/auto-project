@@ -9,7 +9,7 @@ interface SearchParams {
 }
 
 async function getCars() {
-  const res = await fetch('http://localhost:1337/api/cars?populate=*', { cache: 'no-store' });
+  const res = await fetch('https://auto-project-production-ecda.up.railway.app/api/cars?populate=*', { cache: 'no-store' });
   if (!res.ok) throw new Error('Ошибка загрузки');
   return res.json();
 }
@@ -195,8 +195,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
             {cars.map((car: any) => {
               const { make, model, year, price, mileage, image, body_type, country: carCountry } = car;
               let imageUrl = 'https://via.placeholder.com/400x300?text=Нет+фото';
-              if (image && Array.isArray(image) && image.length > 0) imageUrl = `http://localhost:1337${image[0].url}`;
-              else if (image && image.url) imageUrl = `http://localhost:1337${image.url}`;
+              if (image && Array.isArray(image) && image.length > 0) imageUrl = `https://auto-project-production-ecda.up.railway.app${image[0].url}`;
+              else if (image && image.url) imageUrl = `https://auto-project-production-ecda.up.railway.app${image.url}`;
               return (
                 <Link href={`/cars/${car.documentId}`} key={car.id} className="group block">
                   <div className="bg-black/70 backdrop-blur-sm border border-[#c9a227]/40 rounded-lg overflow-hidden hover:border-[#c9a227] hover:shadow-[0_0_50px_rgba(201,162,39,0.5)] md:hover:-translate-y-1 transition-all duration-500">
