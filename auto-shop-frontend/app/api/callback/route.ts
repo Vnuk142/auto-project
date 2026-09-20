@@ -5,37 +5,47 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { name, phone, car } = body;
 
+    if (!name || !phone) {
+      return NextResponse.json({ error: 'Заполните все поля' }, { status: 400 });
+    }
+
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
-    const chatId = process.env.TELEGRAM_CHAT_ID;
+    const chatIdsRaw = process.env.TELEGRAM_CHAT_IDS || process.env.TELEGRAM_CHAT_ID || '';
 
-    console.log('=== ЗАЯВКА ===');
-    console.log('Имя:', name);
-    console.log('Телефон:', phone);
-    console.log('Токен:', botToken ? 'ЕСТЬ' : 'НЕТ');
-    console.log('Chat ID:', chatId ? 'ЕСТЬ' : 'НЕТ');
-
-    if (!botToken || !chatId) {
-      return NextResponse.json({ error: 'No Telegram config' }, { status: 500 });
+    if (!botToken || !chatIdsRaw) {
+      return NextResponse.json({ error: 'Не настроен Telegram' }, { status: 500 });
     }
 
-    const text = `🔔 НОВАЯ ЗАЯВКА!\n👤 ${name}\n📞 ${phone}` + (car ? `\n🚗 ${car}` : '');
+    const chatIds = chatIdsRaw.split(',').map((id) => id.trim()).filter(Boolean);
 
-    const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, text }),
-    });
+    let text = `🔔 НОВАЯ ЗАЯВКА С САЙТА AUTOLUX42!\n\n`;
+    text += `👤 Имя: ${name}\n`;
+    text += `📞 Телефон: ${phone}\n`;
+    if (car) text += `🚗 Автомобиль: ${car}\n`;
+    text += `\n⏰ ${new Date().toLocaleString('ru-RU')}`;
 
-    const data = await res.json();
-    console.log('Ответ TG:', JSON.stringify(data));
-
-    if (!res.ok) {
-      return NextResponse.json({ error: 'TG error', details: data }, { status: 500 });
+    const results = [];
+    for (const chatId of chatIds) {
+      try {
+        const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: chatId, text }),
+        });
+        const data = await res.json();
+        results.push({ chatId, ok: data.ok });
+      } catch (err) {
+        results.push({ chatId, ok: false });
+      }
     }
 
-    return NextResponse.json({ success: true });
+    const anyOk = results.some((r) => r.ok);
+    if (!anyOk) {
+      return NextResponse.json({ error: 'Ни одно сообщение не отправлено', details: results }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true, results });
   } catch (err: any) {
-    console.error('ОШИБКА:', err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
