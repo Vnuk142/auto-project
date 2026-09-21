@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import CallbackForm from './CallbackForm';
+import MobileMenu from './MobileMenu';
 
 interface SearchParams { country?: string; minPrice?: string; maxPrice?: string; sort?: string; }
 
@@ -76,25 +77,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
               <Link href="/reviews" className="hover:text-[#c9a227]">Отзывы</Link>
               <a href="#contacts" className="hover:text-[#c9a227]">Контакты</a>
             </nav>
-            <details className="md:hidden relative">
-              <summary className="list-none cursor-pointer p-1 text-[#c9a227]">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="3" y1="6" x2="21" y2="6"></line>
-                  <line x1="3" y1="12" x2="21" y2="12"></line>
-                  <line x1="3" y1="18" x2="21" y2="18"></line>
-                </svg>
-              </summary>
-              <nav className="absolute right-0 top-full mt-2 w-56 bg-[#0a0a0a]/98 backdrop-blur border border-[#c9a227]/40 rounded-lg shadow-2xl py-3 z-50">
-                <Link href="/" className="block px-5 py-3 text-sm hover:bg-[#1a1408] hover:text-[#c9a227]">Главная</Link>
-                <a href="#catalog" className="block px-5 py-3 text-sm hover:bg-[#1a1408] hover:text-[#c9a227]">Авто в РФ</a>
-                <a href="#services" className="block px-5 py-3 text-sm hover:bg-[#1a1408] hover:text-[#c9a227]">Услуги</a>
-                <Link href="/promo" className="block px-5 py-3 text-sm hover:bg-[#1a1408] hover:text-[#c9a227]">Акции</Link>
-                <Link href="/news" className="block px-5 py-3 text-sm hover:bg-[#1a1408] hover:text-[#c9a227]">Новости</Link>
-                <a href="#about" className="block px-5 py-3 text-sm hover:bg-[#1a1408] hover:text-[#c9a227]">О нас</a>
-                <Link href="/reviews" className="block px-5 py-3 text-sm hover:bg-[#1a1408] hover:text-[#c9a227]">Отзывы</Link>
-                <a href="#contacts" className="block px-5 py-3 text-sm hover:bg-[#1a1408] hover:text-[#c9a227]">Контакты</a>
-              </nav>
-            </details>
+            <MobileMenu />
           </div>
         </div>
       </header>
