@@ -43,16 +43,22 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
         <div className="max-w-7xl mx-auto px-2 sm:px-6 py-2 flex justify-between items-center gap-2">
           <div className="flex items-center gap-2">
             <span className="text-[#c9a227] font-bold tracking-wider gold-glow text-[11px] sm:text-base">ПОДПИСЫВАЙСЯ</span>
-            <a href="https://vk.ru/autolux42nk" target="_blank" className="hover:scale-110 transition">
+            <a href="https://vk.ru/autolux42nk" target="_blank" className="hover:scale-110 transition" title="ВКонтакте">
               <svg width="28" height="28" viewBox="0 0 48 48" fill="none" className="sm:w-9 sm:h-9">
                 <rect width="48" height="48" rx="10" fill="#0077FF"/>
                 <path d="M25.7 34C15.5 34 9.7 27 9.4 15.4H14.6C14.8 24 18.8 27.6 21.9 28.4V15.4H26.7V22.8C29.7 22.5 32.9 19.2 33.9 15.4H38.7C38 20.1 34.6 23.4 32 24.7C34.6 25.8 38.4 28.7 39.8 34H34.5C33.4 30.4 30.4 27.8 26.7 27.4V34H25.7Z" fill="white"/>
               </svg>
             </a>
-            <a href="https://t.me/avtolux42" target="_blank" className="hover:scale-110 transition">
+            <a href="https://t.me/avtolux42" target="_blank" className="hover:scale-110 transition" title="Telegram">
               <svg width="28" height="28" viewBox="0 0 48 48" fill="none" className="sm:w-9 sm:h-9">
                 <rect width="48" height="48" rx="10" fill="#29B6F6"/>
                 <path d="M34.5 14.5L11.5 23.5C10.2 24 10.2 24.8 11.3 25.1L17.2 27L19.5 33.8C19.8 34.6 20.2 34.7 20.8 34.1L23.8 31.2L29.7 35.6C30.7 36.1 31.4 35.9 31.7 34.7L36.3 16.2C36.6 14.8 35.8 14.1 34.5 14.5Z" fill="white"/>
+              </svg>
+            </a>
+            <a href="https://max.ru/channel_AvtoImport8888" target="_blank" className="hover:scale-110 transition" title="MAX">
+              <svg width="28" height="28" viewBox="0 0 48 48" fill="none" className="sm:w-9 sm:h-9">
+                <rect width="48" height="48" rx="10" fill="#8B5CF6"/>
+                <text x="24" y="33" fontFamily="Arial, sans-serif" fontSize="22" fontWeight="bold" fill="white" textAnchor="middle">M</text>
               </svg>
             </a>
           </div>
@@ -234,7 +240,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
               <div className="grid grid-cols-3 gap-2">
                 <a href="https://wa.me/79675978888" target="_blank" className="text-center border border-green-600 text-green-500 text-[10px] py-2 rounded font-semibold">WhatsApp</a>
                 <a href="https://t.me/+79675978888" target="_blank" className="text-center border border-sky-500 text-sky-400 text-[10px] py-2 rounded font-semibold">Telegram</a>
-                <a href="https://max.ru/79675978888" target="_blank" className="text-center border border-purple-500 text-purple-400 text-[10px] py-2 rounded font-semibold">MAX</a>
+                <a href="https://max.ru/channel_AvtoImport8888" target="_blank" className="text-center border border-purple-500 text-purple-400 text-[10px] py-2 rounded font-semibold">MAX</a>
               </div>
             </div>
             <div className="bg-black/80 border border-[#c9a227]/50 p-4 sm:p-6 rounded-lg">
@@ -243,7 +249,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
               <div className="grid grid-cols-3 gap-2">
                 <a href="https://wa.me/79963338606" target="_blank" className="text-center border border-green-600 text-green-500 text-[10px] py-2 rounded font-semibold">WhatsApp</a>
                 <a href="https://t.me/+79963338606" target="_blank" className="text-center border border-sky-500 text-sky-400 text-[10px] py-2 rounded font-semibold">Telegram</a>
-                <a href="https://max.ru/79963338606" target="_blank" className="text-center border border-purple-500 text-purple-400 text-[10px] py-2 rounded font-semibold">MAX</a>
+                <a href="https://max.ru/channel_AvtoImport8888" target="_blank" className="text-center border border-purple-500 text-purple-400 text-[10px] py-2 rounded font-semibold">MAX</a>
               </div>
             </div>
             <div className="bg-black/80 border border-[#c9a227]/50 p-4 sm:p-6 rounded-lg">
@@ -252,7 +258,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
               <div className="grid grid-cols-3 gap-2">
                 <a href="https://wa.me/79095147778" target="_blank" className="text-center border border-green-600 text-green-500 text-[10px] py-2 rounded font-semibold">WhatsApp</a>
                 <a href="https://t.me/+79095147778" target="_blank" className="text-center border border-sky-500 text-sky-400 text-[10px] py-2 rounded font-semibold">Telegram</a>
-                <a href="https://max.ru/79095147778" target="_blank" className="text-center border border-purple-500 text-purple-400 text-[10px] py-2 rounded font-semibold">MAX</a>
+                <a href="https://max.ru/channel_AvtoImport8888" target="_blank" className="text-center border border-purple-500 text-purple-400 text-[10px] py-2 rounded font-semibold">MAX</a>
               </div>
             </div>
           </div>
