@@ -63,7 +63,8 @@ async def start_setup_server() -> None:
     await runner.setup()
     port = int(os.getenv("PORT", "10000"))
     await web.TCPSite(runner, host="0.0.0.0", port=port).start()
-    logger.warning("Настройка не завершена: отсутствуют BOT_TOKEN или DATABASE_URL")
+    missing = [name for name in ("BOT_TOKEN", "DATABASE_URL") if not os.getenv(name)]
+    logger.warning("Настройка не завершена. Отсутствуют переменные: %s", ", ".join(missing))
     stop_event = asyncio.Event()
     loop = asyncio.get_running_loop()
     for sig in (signal.SIGINT, signal.SIGTERM):
