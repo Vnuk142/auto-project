@@ -53,6 +53,12 @@ Index(
 
 
 def make_session_factory(database_url: str):
+    # Render выдаёт обычный postgresql://, а SQLAlchemy async требует +asyncpg.
+    # Преобразуем только схему, не раскрывая пароль в логах.
+    if database_url.startswith("postgresql://"):
+        database_url = "postgresql+asyncpg://" + database_url[len("postgresql://"):]
+    elif database_url.startswith("postgres://"):
+        database_url = "postgresql+asyncpg://" + database_url[len("postgres://"):]
     engine = create_async_engine(database_url, pool_pre_ping=True, pool_size=5, max_overflow=10)
     factory = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
     return engine, factory
