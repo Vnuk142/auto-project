@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: fanty-telegram-bot
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: WEBHOOK_MODE
+        value: "true"
+      - key: WEBAPP_URL
+        value: "https://fanty-telegram-bot.onrender.com"
+      - key: PORT
+        value: "10000"
+      - key: PRICE_MEDIUM
+        value: "50"
+      - key: PRICE_HARD
+        value: "100"

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#1a1a1a">
+  <title>Фанты для двоих — 18+</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <main class="app">
+    <header class="masthead">
+      <div class="brand-mark" aria-hidden="true">✦</div>
+      <p class="eyebrow">ИГРА ДЛЯ ПАРЫ</p>
+      <h1>Фанты <span>для двоих</span></h1>
+      <p class="lead">60 идей для особенного вечера</p>
+    </header>
+
+    <aside class="adult-banner" role="note">
+      <span aria-hidden="true">🔞</span>
+      <p><strong>Контент 18+.</strong> Только для совершеннолетних. Играйте добровольно и по взаимному согласию. Любое задание можно пропустить.</p>
+    </aside>
+
+    <section class="status" id="status" aria-live="polite">
+      <span class="spinner" id="spinner" aria-hidden="true"></span>
+      <span id="statusText">Проверяем доступ…</span>
+    </section>
+
+    <section class="game hidden" id="game" aria-label="Игра">
+      <div class="section-title"><span>01</span><h2>Выберите уровень</h2></div>
+      <div class="levels" id="levels">
+        <button class="level selected" data-level="easy" type="button">
+          <span class="level-top"><span>Лёгкий</span><span class="level-access" data-access="easy">Бесплатно</span></span>
+          <span class="level-caption">Улыбки и знакомство</span>
+        </button>
+        <button class="level" data-level="medium" type="button">
+          <span class="level-top"><span>Средний</span><span class="level-access" data-access="medium">🔒 50 ⭐</span></span>
+          <span class="level-caption">Больше романтики</span>
+        </button>
+        <button class="level" data-level="hard" type="button">
+          <span class="level-top"><span>Смелый</span><span class="level-access" data-access="hard">🔒 100 ⭐</span></span>
+          <span class="level-caption">Откровенность и доверие</span>
+        </button>
+      </div>
+
+      <div class="section-title second"><span>02</span><h2>Кому фант?</h2></div>
+      <div class="choice-buttons" id="genderButtons">
+        <button class="choice" type="button" data-gender="male">Для него</button>
+        <button class="choice" type="button" data-gender="female">Для неё</button>
+      </div>
+
+      <section class="task-card" id="taskCard" aria-live="polite">
+        <p class="task-kicker" id="taskKicker">ВАШ ФАНТ</p>
+        <div class="task-text" id="taskDisplay">Выберите, для кого задание, — и начнём!</div>
+      </section>
+
+      <section class="timer-section hidden" id="timerSection" aria-label="Таймер">
+        <div class="timer" id="timer" aria-live="off">01:00</div>
+        <p class="timer-caption" id="timerCaption">У вас одна минута</p>
+      </section>
+
+      <div class="actions">
+        <button class="primary hidden" id="confirmButton" type="button">Подтвердить выполнение — старт (1 мин)</button>
+        <button class="secondary hidden" id="nextButton" type="button">Стоп / Далее</button>
+      </div>
+      <p class="footnote">Никаких обязательств. «Нет» и «Стоп» всегда достаточно.</p>
+    </section>
+
+    <section class="fatal hidden" id="fatal" role="alert">
+      <p id="fatalText">Откройте игру через Telegram-бота.</p>
+      <button class="primary" type="button" id="closeButton">Закрыть Mini App</button>
+    </section>
+  </main>
+</body>
+</html>
