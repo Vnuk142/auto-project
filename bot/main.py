@@ -31,7 +31,56 @@ async def prepare_database(engine) -> None:
             await asyncio.sleep(2)
 
 
+async def start_setup_server() -> None:
+    """Публичная страница готовности, пока секреты не внесены в Render Environment.
+
+    Здесь нет API игры или оплаты, и мы не имитируем рабочий Telegram-бот.
+    После добавления BOT_TOKEN и DATABASE_URL обычная сборка стартует автоматически.
+    """
+    async def health(_):
+        return web.json_response({"status": "setup_required"})
+
+    async def index(_):
+        return web.Response(
+            text=(
+                "<!doctype html><html lang='ru'><meta charset='utf-8'>"
+                "<meta name='viewport' content='width=device-width,initial-scale=1'>"
+                "<title>Фанты для двоих — настройка</title>"
+                "<body style='background:#1a1a1a;color:white;font:18px sans-serif;"
+                "max-width:520px;margin:60px auto;padding:16px'>"
+                "<h1>Фанты для двоих</h1>"
+                "<p>Сервер подключён к Render. Игра ожидает настройки "
+                "Telegram-бота и базы данных.</p>"
+                "</body></html>"
+            ),
+            content_type="text/html",
+        )
+
+    app = web.Application()
+    app.router.add_get("/health", health)
+    app.router.add_get("/", index)
+    runner = web.AppRunner(app, access_log=None)
+    await runner.setup()
+    port = int(os.getenv("PORT", "10000"))
+    await web.TCPSite(runner, host="0.0.0.0", port=port).start()
+    logger.warning("Настройка не завершена: отсутствуют BOT_TOKEN или DATABASE_URL")
+    stop_event = asyncio.Event()
+    loop = asyncio.get_running_loop()
+    for sig in (signal.SIGINT, signal.SIGTERM):
+        try:
+            loop.add_signal_handler(sig, stop_event.set)
+        except NotImplementedError:
+            pass
+    try:
+        await stop_event.wait()
+    finally:
+        await runner.cleanup()
+
+
 async def main() -> None:
+    if not os.getenv("BOT_TOKEN") or not os.getenv("DATABASE_URL"):
+        await start_setup_server()
+        return
     settings = get_settings()
     logging.basicConfig(
         level=logging.INFO,
