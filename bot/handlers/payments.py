@@ -67,6 +67,10 @@ async def pre_checkout(query: PreCheckoutQuery, settings: Settings,
         await query.answer(ok=False, error_message="Некорректные данные счёта")
         return
     level, user_id = valid
+    # Даже старый инвойс не должен списать Stars у владельца.
+    if user_id in settings.free_user_id_set:
+        await query.answer(ok=False, error_message="Этот уровень вам уже доступен бесплатно")
+        return
     if query.currency != "XTR" or query.total_amount != settings.prices[level]:
         await query.answer(ok=False, error_message="Цена изменилась. Запросите новый счёт")
         return
