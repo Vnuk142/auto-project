@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     webapp_url: str = Field(default_factory=lambda: os.getenv("RENDER_EXTERNAL_URL", ""))
     database_url: str
     admin_ids: str = ""
+    free_user_ids: str = ""  # Telegram user_id владельца, которому доступны все уровни бесплатно
     support_contact: str = ""
     max_init_data_age_seconds: int = Field(default=86400, gt=0)
     price_medium: int = Field(default=50, gt=0)
@@ -48,6 +49,18 @@ class Settings(BaseSettings):
             return {int(item.strip()) for item in self.admin_ids.split(",") if item.strip()}
         except ValueError as exc:
             raise ValueError("ADMIN_IDS: укажите числовые Telegram user_id через запятую") from exc
+
+    @property
+    def free_user_id_set(self) -> set[int]:
+        # Не путаем владельцев с администраторами: бесплатный доступ
+        # не даёт права использовать /refund.
+        try:
+            parsed = {int(item.strip()) for item in self.free_user_ids.split(",") if item.strip()}
+        except ValueError as exc:
+            raise ValueError("FREE_USER_IDS: укажите числовые Telegram user_id через запятую") from exc
+        if any(value <= 0 for value in parsed):
+            raise ValueError("FREE_USER_IDS должен содержать только положительные Telegram user_id")
+        return parsed
 
     @property
     def prices(self) -> dict[str, int]:
