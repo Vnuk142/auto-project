@@ -112,6 +112,24 @@ async def main() -> None:
 
     app.router.add_get("/ops", ops_status)
 
+    async def probe_outbound_network() -> None:
+        """Один раз проверяем сеть без токенов, чтобы отличить 429 от блокировки egress."""
+        from aiohttp import ClientSession, ClientTimeout
+        async with ClientSession(timeout=ClientTimeout(total=7)) as client:
+            for label, url in (
+                ("telegram_root", "https://api.telegram.org/"),
+                ("internet_control", "https://example.com/"),
+            ):
+                try:
+                    async with client.get(url, allow_redirects=False) as reply:
+                        state = f"HTTP {reply.status}"
+                except Exception as exc:
+                    state = type(exc).__name__
+                telegram_status[label] = state
+                logger.info("Сетевая проверка %s: %s", label, state)
+
+    app["outbound_probe_task"] = asyncio.create_task(probe_outbound_network())
+
     if settings.webhook_mode:
         # Оставляем запрос webhook открытым до обработки платежа и pre_checkout.
         SimpleRequestHandler(
