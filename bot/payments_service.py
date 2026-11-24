@@ -30,6 +30,8 @@ async def send_level_invoice(
         user = await session.get(User, user_id)
         if not user or not user.age_confirmed_at:
             raise PurchaseNotAllowed("Сначала подтвердите 18+ командой /start")
+        if user_id in settings.free_user_id_set:
+            raise PurchaseNotAllowed("Для вашего аккаунта этот уровень открыт бесплатно. Запустите игру!")
         if await has_purchase(session, user_id, level):
             raise PurchaseNotAllowed("Этот уровень уже куплен")
     try:
