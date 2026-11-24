@@ -86,10 +86,13 @@ async def has_purchase(session: AsyncSession, user_id: int, level: str) -> bool:
     return await session.scalar(stmt) is not None
 
 
-async def unlocked_levels(session: AsyncSession, user: User) -> dict[str, bool]:
+async def unlocked_levels(session: AsyncSession, user: User, free_user_ids: set[int] | None = None) -> dict[str, bool]:
     confirmed = user.age_confirmed_at is not None
     if not confirmed:
         return {"easy": False, "medium": False, "hard": False}
+    # Владелец проходит ту же проверку 18+, но не должен покупать уровни.
+    if free_user_ids and user.user_id in free_user_ids:
+        return {"easy": True, "medium": True, "hard": True}
     rows = await session.scalars(
         select(Purchase.level).where(Purchase.user_id == user.user_id, Purchase.refunded_at.is_(None))
     )
