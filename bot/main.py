@@ -131,6 +131,19 @@ async def main() -> None:
             while not stop_event.is_set():
                 attempt += 1
                 try:
+                    # Если webhook уже зарегистрирован, повторно SetWebhook не вызываем:
+                    # Telegram может отвечать 429 на каждом старте Render.
+                    current = await bot.get_webhook_info()
+                    if current.url == webhook_url:
+                        logger.info(
+                            "Webhook уже установлен: %s (ожидают: %s)",
+                            current.url, current.pending_update_count,
+                        )
+                        break
+                    logger.info(
+                        "Текущий Telegram webhook: %s (ожидают: %s)",
+                        current.url or "<пусто>", current.pending_update_count,
+                    )
                     await bot.set_webhook(
                         url=webhook_url,
                         secret_token=settings.webhook_secret,
