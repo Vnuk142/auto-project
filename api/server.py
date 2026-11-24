@@ -88,9 +88,18 @@ async def me(request: web.Request):
     _, user = await auth_context(request)
     if not user or not user.age_confirmed_at:
         raise web.HTTPForbidden(text="Confirm 18+ with /start")
+    settings: Settings = request.app["settings"]
+    is_free = user.user_id in settings.free_user_id_set
     async with request.app["session_factory"]() as session:
-        levels = await unlocked_levels(session, user)
-    return web.json_response({"user_id": user.user_id, "levels": levels, "prices": request.app["settings"].prices})
+        levels = await unlocked_levels(session, user, settings.free_user_id_set)
+    # Показываем стоимость 0 ⭐ для владельца; остальные видят обычные цены.
+    prices = {"easy": 0, "medium": 0, "hard": 0} if is_free else settings.prices
+    return web.json_response({
+        "user_id": user.user_id,
+        "levels": levels,
+        "prices": prices,
+        "free_access": is_free,
+    })
 
 
 async def tasks(request: web.Request):
@@ -101,7 +110,7 @@ async def tasks(request: web.Request):
     if not isinstance(level, str) or level not in TASKS:
         raise web.HTTPBadRequest(text="Unknown level")
     async with request.app["session_factory"]() as session:
-        levels = await unlocked_levels(session, user)
+        levels = await unlocked_levels(session, user, request.app["settings"].free_user_id_set)
     if not levels[level]:
         raise web.HTTPForbidden(text="Level is locked")
     return web.json_response({"level": level, "tasks": TASKS[level]})
