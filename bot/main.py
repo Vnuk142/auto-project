@@ -97,6 +97,21 @@ async def main() -> None:
     dispatcher.include_router(webapp_data.router)
 
     app = create_app(settings, bot, session_factory)
+    telegram_status = {
+        "bot_id": bot.id,
+        "username": None,
+        "webhook": "pending" if settings.webhook_mode else "polling",
+        "attempt": 0,
+        "last_method": None,
+        "retry_after_seconds": None,
+    }
+
+    async def ops_status(_: web.Request) -> web.Response:
+        # Только публичная техническая информация, без токенов и паролей.
+        return web.json_response(telegram_status, headers={"Cache-Control": "no-store"})
+
+    app.router.add_get("/ops", ops_status)
+
     if settings.webhook_mode:
         # Оставляем запрос webhook открытым до обработки платежа и pre_checkout.
         SimpleRequestHandler(
@@ -124,17 +139,30 @@ async def main() -> None:
         await site.start()
         logger.info("HTTP запущен на :%s", port)
         if settings.webhook_mode:
+            # Один контрольный запрос показывает, к какому боту относится токен.
+            # Не блокируем сервер, если Telegram временно ограничивает Bot API.
+            try:
+                me = await asyncio.wait_for(bot.get_me(), timeout=12)
+                telegram_status["username"] = me.username
+                logger.info("Telegram-бот по токену: @%s (ID %s)", me.username, me.id)
+            except Exception as exc:
+                logger.warning("Проверка имени Telegram-бота: %s", type(exc).__name__)
+
             # Ограничение SetWebhook у Telegram (429) нельзя лечить перезапуском
             # контейнера: при повторном старте лимит только продлевается.
             webhook_url = f"{settings.webapp_url}/telegram/webhook"
             attempt = 0
             while not stop_event.is_set():
                 attempt += 1
+                telegram_status["attempt"] = attempt
+                method = "getWebhookInfo"
+                telegram_status["last_method"] = method
                 try:
                     # Если webhook уже зарегистрирован, повторно SetWebhook не вызываем:
                     # Telegram может отвечать 429 на каждом старте Render.
                     current = await bot.get_webhook_info()
                     if current.url == webhook_url:
+                        telegram_status.update(webhook="registered", retry_after_seconds=None)
                         logger.info(
                             "Webhook уже установлен: %s (ожидают: %s)",
                             current.url, current.pending_update_count,
@@ -144,21 +172,25 @@ async def main() -> None:
                         "Текущий Telegram webhook: %s (ожидают: %s)",
                         current.url or "<пусто>", current.pending_update_count,
                     )
+                    method = "setWebhook"
+                    telegram_status["last_method"] = method
                     await bot.set_webhook(
                         url=webhook_url,
                         secret_token=settings.webhook_secret,
                         allowed_updates=dispatcher.resolve_used_update_types(),
                         drop_pending_updates=False,
                     )
+                    telegram_status.update(webhook="registered", retry_after_seconds=None)
                     logger.info("Webhook Telegram зарегистрирован: %s", webhook_url)
                     break
                 except TelegramRetryAfter as exc:
                     # 429 может приходить даже на GetWebhookInfo. Увеличиваем
                     # паузу, чтобы не продлевать блокировку частыми запросами.
                     delay = max(int(exc.retry_after) + 2, min(600, 60 * (2 ** min(attempt - 1, 4))))
+                    telegram_status.update(webhook="rate_limited", last_method=method, retry_after_seconds=delay)
                     logger.warning(
-                        "Telegram ограничил запрос Bot API; повтор через %s сек. Попытка %s",
-                        delay, attempt,
+                        "Telegram 429 для %s; повтор через %s сек. Попытка %s",
+                        method, delay, attempt,
                     )
                     try:
                         await asyncio.wait_for(stop_event.wait(), timeout=delay)
@@ -166,6 +198,7 @@ async def main() -> None:
                         continue
                 except (TelegramNetworkError, OSError) as exc:
                     delay = min(60, 2 ** min(attempt, 6))
+                    telegram_status.update(webhook="network_error", last_method=method, retry_after_seconds=delay)
                     logger.warning(
                         "Сеть Telegram временно недоступна (%s); повтор через %s сек.",
                         type(exc).__name__, delay,
