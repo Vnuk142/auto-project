@@ -6,6 +6,7 @@ import signal
 
 from aiohttp import web
 from aiogram import Bot, Dispatcher
+from aiogram.exceptions import TelegramNetworkError, TelegramRetryAfter
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -123,13 +124,41 @@ async def main() -> None:
         await site.start()
         logger.info("HTTP запущен на :%s", port)
         if settings.webhook_mode:
-            await bot.set_webhook(
-                url=f"{settings.webapp_url}/telegram/webhook",
-                secret_token=settings.webhook_secret,
-                allowed_updates=dispatcher.resolve_used_update_types(),
-                drop_pending_updates=False,
-            )
-            logger.info("Webhook Telegram зарегистрирован")
+            # Ограничение SetWebhook у Telegram (429) нельзя лечить перезапуском
+            # контейнера: при повторном старте лимит только продлевается.
+            webhook_url = f"{settings.webapp_url}/telegram/webhook"
+            attempt = 0
+            while not stop_event.is_set():
+                attempt += 1
+                try:
+                    await bot.set_webhook(
+                        url=webhook_url,
+                        secret_token=settings.webhook_secret,
+                        allowed_updates=dispatcher.resolve_used_update_types(),
+                        drop_pending_updates=False,
+                    )
+                    logger.info("Webhook Telegram зарегистрирован: %s", webhook_url)
+                    break
+                except TelegramRetryAfter as exc:
+                    delay = max(1, int(exc.retry_after)) + 2
+                    logger.warning(
+                        "Telegram ограничил SetWebhook; повтор через %s сек. Попытка %s",
+                        delay, attempt,
+                    )
+                    try:
+                        await asyncio.wait_for(stop_event.wait(), timeout=delay)
+                    except asyncio.TimeoutError:
+                        continue
+                except (TelegramNetworkError, OSError) as exc:
+                    delay = min(60, 2 ** min(attempt, 6))
+                    logger.warning(
+                        "Сеть Telegram временно недоступна (%s); повтор через %s сек.",
+                        type(exc).__name__, delay,
+                    )
+                    try:
+                        await asyncio.wait_for(stop_event.wait(), timeout=delay)
+                    except asyncio.TimeoutError:
+                        continue
             await stop_event.wait()
         else:
             await bot.delete_webhook(drop_pending_updates=False)
