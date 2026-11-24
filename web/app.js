@@ -21,6 +21,7 @@ const tasks = {easy: null, medium: null, hard: null};
 const PRICES = {medium: 50, hard: 100}; // При изменении .env обновить и здесь.
 const LEVEL_NAMES = {easy: 'Лёгкий', medium: 'Средний', hard: 'Смелый'};
 const unlockedLevels = {easy: false, medium: false, hard: false};
+let freeAccess = false; // Персональный бесплатный доступ владельца от сервера.
 
 let selectedLevel = 'easy';
 let selectedGender = null;
@@ -64,7 +65,9 @@ function drawLevelAccess() {
   Object.keys(unlockedLevels).forEach((level) => {
     const node = document.querySelector(`[data-access="${level}"]`);
     if (level === 'easy') node.textContent = '✅ Бесплатно';
-    else node.textContent = unlockedLevels[level] ? '✅ Куплен' : `🔒 ${PRICES[level]} ⭐`;
+    else node.textContent = unlockedLevels[level]
+      ? (freeAccess ? '✅ Бесплатно' : '✅ Куплен')
+      : `🔒 ${PRICES[level]} ⭐`;
   });
 }
 
@@ -210,6 +213,7 @@ async function buyLevel(level) {
         const data = await apiPost('/api/me');
         Object.assign(unlockedLevels, data.levels);
         Object.assign(PRICES, data.prices ?? {});
+        freeAccess = Boolean(data.free_access);
         drawLevelAccess();
         if (unlockedLevels[level]) {
           await setLevel(level);
@@ -247,6 +251,7 @@ async function init() {
     const result = await apiPost('/api/me');
     Object.assign(unlockedLevels, result.levels);
     Object.assign(PRICES, result.prices ?? {});
+    freeAccess = Boolean(result.free_access);
     drawLevelAccess();
     $('status').classList.add('hidden');
     game.classList.remove('hidden');
