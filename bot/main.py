@@ -153,9 +153,11 @@ async def main() -> None:
                     logger.info("Webhook Telegram зарегистрирован: %s", webhook_url)
                     break
                 except TelegramRetryAfter as exc:
-                    delay = max(1, int(exc.retry_after)) + 2
+                    # 429 может приходить даже на GetWebhookInfo. Увеличиваем
+                    # паузу, чтобы не продлевать блокировку частыми запросами.
+                    delay = max(int(exc.retry_after) + 2, min(600, 60 * (2 ** min(attempt - 1, 4))))
                     logger.warning(
-                        "Telegram ограничил SetWebhook; повтор через %s сек. Попытка %s",
+                        "Telegram ограничил запрос Bot API; повтор через %s сек. Попытка %s",
                         delay, attempt,
                     )
                     try:
