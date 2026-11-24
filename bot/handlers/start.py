@@ -32,7 +32,10 @@ async def start(message: Message, session_factory: async_sessionmaker[AsyncSessi
         return
 
     if confirmed:
-        await message.answer("Игра доступна. Удачного вечера!", reply_markup=game_keyboard())
+        greeting = ("Ваш аккаунт: все уровни бесплатны! 🎲"
+                    if message.from_user.id in settings.free_user_id_set
+                    else "Игра доступна. Удачного вечера!")
+        await message.answer(greeting, reply_markup=game_keyboard())
         await message.answer("Открыть защищённую Mini App:", reply_markup=game_inline_keyboard(settings.webapp_url))
     elif declined and utcnow() - declined < timedelta(hours=24):
         await message.answer(
